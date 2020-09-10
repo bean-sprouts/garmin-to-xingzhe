@@ -1,0 +1,28 @@
+{
+  "name": "佳明骑行记录导入行者",
+  "description": "佳明骑行记录导入行者",
+  "version": "1.0",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_icon": "logo.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://connect.garmin.cn/*",
+        "https://www.imxingzhe.com/*"
+      ],
+      "js": [
+        "/content_script.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "storage",
+    "http://*/*",
+    "https://*/*"
+  ]
+}
