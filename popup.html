@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible"
+          content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 15px;
+        }
+
+        .inputContainer {
+            box-sizing: border-box;
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        .inputContainer > input {
+            padding: 5px;
+        }
+
+        #mask {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+        }
+
+        #message {
+            font-size: 14px;
+            line-height: 14px;
+            text-align: center;
+            height: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="mask">loading...</div>
+<div id="message">佳明骑行记录导入行者</div>
+<div class="inputContainer">
+    <input type="number"
+           id="periodInMinutesInput"
+           placeholder="检查更新的间隔时间">
+    <label for="periodInMinutesInput"
+           id="periodInMinutesLabel">分钟</label>
+</div>
+<button id="submit"
+        style="width: 200px; margin-bottom: 10px;">保存
+</button>
+<button id="sync"
+        style="width: 200px;">立即同步
+</button>
+<div id="resultText"></div>
+<!--<ol id="list"
+    style="width: 740px;height: 85vh;overflow: auto;"></ol>-->
+<!--    <script src="js/jszip.min.js"></script>-->
+<script src="js/popup.js"></script>
+</body>
+
+</html>
