@@ -19,6 +19,7 @@
   "permissions": [
     "webRequest",
     "webRequestBlocking",
+    "windows",
     "alarms",
     "notifications",
     "storage",

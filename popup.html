@@ -46,12 +46,37 @@
             color: #333;
             margin-bottom: 10px;
         }
+
+        .status-container {
+            margin-bottom: 10px;
+        }
+
+        .status-btn {
+            display: flex;
+            font-size: 14px;
+            width: 200px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .status-btn > .status-text {
+            margin-left: 5px;
+        }
     </style>
 </head>
 
 <body>
 <div id="mask">loading...</div>
 <div id="message">佳明骑行记录导入行者</div>
+<div class="status-container">
+    <div class="status-btn" id="garminStatusContainer">
+        <div>佳明登录状态:</div>
+        <div class="status-text" id="garminStatusEl">未登录</div>
+    </div>
+    <div class="status-btn" id="xingzheStatusContainer">
+        <div>行者登录状态:</div>
+        <div class="status-text" id="xingzheStatusEl">未登录</div>
+    </div>
+</div>
 <div class="inputContainer">
     <input type="number"
            id="periodInMinutesInput"
