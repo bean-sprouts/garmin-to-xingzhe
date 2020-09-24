@@ -1,6 +1,6 @@
 function request(url, config = {}) {
   return fetch(url, config).then(res => {
-    if(res.ok) {
+    if (res.ok) {
       return res.json();
     } else {
       throw Error(res.status);
@@ -12,9 +12,9 @@ function request(url, config = {}) {
 async function getXingZheRecordList(userId) {
   const year = new Date().getFullYear();
   let promises = [];
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 10; i++) {
     promises.push(request(`https://www.imxingzhe.com/api/v4/new_workout_list?user_id=${userId}&year=${year - i}&xingzhe_timestamp=${new Date().getTime() / 1000}000`));
-    await sleep(3000);
+    await sleep(1000);
   }
   return Promise.all(promises).then(resArr => {
     console.log('resArr', resArr);
@@ -26,17 +26,30 @@ function getUserInfo() {
   return request(`https://www.imxingzhe.com/api/v4/account/get_user_info/`);
 }
 
-function getFirstRecord() {
+function getXingZheRecord() {
   return getUserInfo().then(res => {
     return getXingZheRecordList(res.userid).then(res => {
-      // 得到最新一条骑行记录，如果为undefined表示10年内没有骑行记录
-      return res[0];
+      // 得到最新一条骑行记录，如果为undefined表示n年内没有骑行记录
+      return res;
     })
   })
 }
 
 function getGarminRecord() {
-  return request(`https://connect.garmin.cn/modern/proxy/activitylist-service/activities/search/activities?activityType=cycling&start=0&limit=100`);
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get('updateNumber', res => {
+      let limit;
+      if (typeof res.updateNumber === 'undefined') {
+        limit = 100;
+        chrome.storage.sync.set({ updateNumber : 100 });
+      } else {
+        limit = res.updateNumber;
+      }
+      request(`https://connect.garmin.cn/modern/proxy/activitylist-service/activities/search/activities?activityType=cycling&start=0&limit=${limit}`)
+        .then(v => resolve(v)).catch(err => reject(err));
+    });
+  })
+
 }
 
 function downloadFile(item) {
@@ -96,8 +109,8 @@ function uploadFile(file, item) {
     method: 'post',
     body: formData
   }).then(res => {
-      console.log('res', res);
-    })
+    console.log('res', res);
+  })
 }
 
 function sleep(time) {
@@ -113,9 +126,33 @@ function run(manual = false) {
     console.log('garminRes', garminRes);
     chrome.storage.sync.set({ isGarminLogin: true });
     if (garminRes.length > 0) {
-      return getFirstRecord().then(res => {
+      return getXingZheRecord().then(res => {
         chrome.storage.sync.set({ isXingZheLogin: true });
-        if (typeof res === 'undefined') {
+        // 得到佳明中有行者中没有的进行同步
+        const forUpdateRecord = garminRes.filter(garminItem => {
+          return !res.some(xingZheItem => garminItem.beginTimestamp === xingZheItem.start_time &&
+            Math.floor(garminItem.distance) === xingZheItem.distance &&
+            Math.floor(garminItem.duration) === xingZheItem.duration)
+        });
+        console.log('forUpdateRecord', forUpdateRecord);
+        if (forUpdateRecord.length > 0) {
+          let successCount = 0;
+          let failedCount = 0;
+          forUpdateRecord.forEach(async item => {
+            try {
+              await downloadFile(item);
+              successCount = successCount + 1;
+            } catch (err) {
+              console.log('err', err);
+              failedCount = failedCount + 1;
+            }
+            await sleep(3000);
+          });
+          message(`骑行记录同步完成，成功${successCount}条，失败${failedCount}条`);
+        } else {
+          manual && message(`骑行记录已是最新，无需同步!`);
+        }
+        /*if (typeof res === 'undefined') {
           // 行者没有骑行记录，导入所有佳明骑行记录
           garminRes.forEach(async item => {
             await downloadFile(item);
@@ -133,7 +170,7 @@ function run(manual = false) {
           } else {
             manual && message(`骑行记录已是最新，无需同步!`);
           }
-        }
+        }*/
       }).catch(error => {
         console.log('error---getFirstRecord', error);
         chrome.storage.sync.set({ isXingZheLogin: false });

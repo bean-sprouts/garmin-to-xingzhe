@@ -14,11 +14,9 @@
   },
   "background": {
     "scripts": ["js/jszip.min.js","js/background.js"],
-    "persistent": true
+    "persistent": false
   },
   "permissions": [
-    "webRequest",
-    "webRequestBlocking",
     "windows",
     "alarms",
     "notifications",
