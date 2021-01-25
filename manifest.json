@@ -21,7 +21,7 @@
     "alarms",
     "notifications",
     "storage",
-    "http://*/*",
-    "https://*/*"
+    "https://www.imxingzhe.com/*",
+    "https://connect.garmin.cn/*"
   ]
 }

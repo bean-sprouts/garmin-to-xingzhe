@@ -126,7 +126,7 @@ function run(manual = false) {
     console.log('garminRes', garminRes);
     chrome.storage.sync.set({ isGarminLogin: true });
     if (garminRes.length > 0) {
-      return getXingZheRecord().then(res => {
+      return getXingZheRecord().then(async res => {
         chrome.storage.sync.set({ isXingZheLogin: true });
         // 得到佳明中有行者中没有的进行同步
         const forUpdateRecord = garminRes.filter(garminItem => {
@@ -138,7 +138,8 @@ function run(manual = false) {
         if (forUpdateRecord.length > 0) {
           let successCount = 0;
           let failedCount = 0;
-          forUpdateRecord.forEach(async item => {
+          for(let i = 0; i < forUpdateRecord.length; i++) {
+            let item = forUpdateRecord[i];
             try {
               await downloadFile(item);
               successCount = successCount + 1;
@@ -147,7 +148,7 @@ function run(manual = false) {
               failedCount = failedCount + 1;
             }
             await sleep(3000);
-          });
+          }
           message(`骑行记录同步完成，成功${successCount}条，失败${failedCount}条`);
         } else {
           manual && message(`骑行记录已是最新，无需同步!`);
